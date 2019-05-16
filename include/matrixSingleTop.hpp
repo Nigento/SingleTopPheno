@@ -34,12 +34,12 @@ class MatrixSingleTop {
 //**********Calculated Values************//
 
     //For SM
-    double Mbg;    double calculateMbg();
+    double Mbg;       double calculateMbg();
     double Mbq;       double calculateMbq();
     double Mbqbar;    double calculateMbqbar();
 
     //For SME
-    TLorentzVector Mbg_mu;        TLorentzVector calculateMbg_mu();
+    TLorentzVector Mbg_mu;           TLorentzVector calculateMbg_mu();
     TLorentzVector Mbq_mu;           TLorentzVector calculateMbq_mu();
     TLorentzVector Mbqbar_mu;        TLorentzVector calculateMbqbar_mu();
 
@@ -51,7 +51,6 @@ class MatrixSingleTop {
             ~MatrixSingleTop();
 
             MatrixSingleTop (TLorentzVector pMother1_user, TLorentzVector b_user, TLorentzVector pt_user, TLorentzVector p3_user, int pMother1_PID_user, int p3_PID_user, int nature_user,double pTmu_user, double etamu_user, double pTelec_user, double etaElec_user);
-            //MatrixSingleTop (TLorentzVector pMother1_user, TLorentzVector b_user, TLorentzVector t_user, TLorentzVector p3_user, int pMother1_PID_user, int b_PID_user, int p3_PID_user, int nature);
 
 //****** Recover values previously obtained ******//
 

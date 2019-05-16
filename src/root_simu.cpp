@@ -45,8 +45,10 @@ void root_simu::Loop()
    pTelec    = new double [nentries];
    etaElec   = new double [nentries];
 
-   for (int i=0; i<nentries; i++)
-      nature [i] = 0;
+   for (int i=0; i<nentries; i++){
+      nature[i] = 0;
+      pTmu[i] = 0;
+      pTelec[i] = 0;}
  //_______________________ 4-momentum filling ______________________//
    Long64_t nbytes = 0, nb = 0;
    for (Long64_t jentry=0; jentry<nentries;jentry++) {

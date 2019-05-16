@@ -108,23 +108,6 @@ double MatrixSingleTop::calculateMbqbar(){
 
 //___________________Matrix elements SME for single top_______________________//
 
-//___________________Constructor_______________________//
-
-/*MatrixSingleTop::MatrixSingleTop (TLorentzVector pMother1_user, TLorentzVector b_user, TLorentzVector t_user, TLorentzVector p3_user,int pMother1_PID_user, int b_PID_user, int p3_PID_user, int nature, double time_user){
-
-    //Particule identity
-    pMother1_PID = pMother1_PID_user;
-    b_PID        = b_PID_user;
-    p3_PID       = p3_PID_user;
-
-    //Creation
-    pMother1 = pMother1_user;
-    b        = b_user;
-    t       = t_user;
-    p3       = p3_user;
-    }
-*/
-
     //___________Function Mbg_mu__________//
 
     TLorentzVector MatrixSingleTop::calculateMbg_mu(){
@@ -202,11 +185,3 @@ TLorentzVector MatrixSingleTop::getMbqbar_mu(){return Mbqbar_mu;}
 double MatrixSingleTop::normMinkowski2(TLorentzVector p){
     return p.Mag2();
 }
-/*
-void MatrixSingleTop::writeNumMatrix(TString s, int n, TLorentzVector m){
-    std::ofstream f("data/matrix/"+s+".txt", std::ios::out);
-    f<<s<<" "<<std::endl<<std::endl;
-    f<<"Events n= "<<n<<std::endl<<std::endl;
-        f<<m[0]<<" "<<m[1]<<" "<<m[2]<<" "<<m[3]<<std::endl;
-    f.close();
-}*/
