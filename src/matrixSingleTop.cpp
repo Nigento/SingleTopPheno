@@ -81,13 +81,14 @@ double MatrixSingleTop::calculateMbq(){
 
   //Preliminar
 
-  double s = normMinkowski2(pt + p3);
+  //double s = normMinkowski2(pt + p3);
+  double s = normMinkowski2(pt+p3);
   double t = normMinkowski2(b - pt);
   double ckm2 = ckm [pMother1_PID][p3_PID]*ckm [pMother1_PID][p3_PID];
 
   //Mbq
 
-  double Mbq = 0.25*gW4*ckm1*ckm2*s*(s - mt2)/((t - mW2)*(t - mW2));
+  double Mbq = (0.25*gW4*ckm1*ckm2*s*(s - mt2))/((t - mW2)*(t - mW2));
 
   return Mbq;
 }
@@ -100,8 +101,8 @@ double MatrixSingleTop::calculateMbqbar(){
   double t = normMinkowski2(b - pt);
   double ckm2 = ckm [pMother1_PID][p3_PID]*ckm [pMother1_PID][p3_PID];
   //Mbqbar
-
-  return 0.25*gW4*ckm1*ckm2*u*(u-mt2)/((t-mW2)*(t-mW2));
+  double Mbqbar = (0.25*gW4*ckm1*ckm2*u*(u-mt2))/((t-mW2)*(t-mW2));
+  return  Mbqbar;
 }
 
 /*****************************************************/
@@ -139,11 +140,11 @@ double MatrixSingleTop::calculateMbqbar(){
     TLorentzVector MatrixSingleTop::calculateMbq_mu(){
 
       //Preliminar
-
+      double s = normMinkowski2(p3 + pt);
       double t = normMinkowski2(b - pt);
       double ckm2= ckm[pMother1_PID][p3_PID]*ckm[pMother1_PID][p3_PID];
-      double scal = 0.25*gW4*ckm1*ckm2*2/((t-mW2)*(t-mW2));
-
+      double scal = 0.25*gW4*ckm1*ckm2*2*s/((t-mW2)*(t-mW2));
+      //TLorentzVector test (1.0, 1.0 , 1.0 ,1.0);
 
 
       //return Mbq_mu
@@ -154,10 +155,10 @@ double MatrixSingleTop::calculateMbqbar(){
       TLorentzVector MatrixSingleTop::calculateMbqbar_mu(){
 
         //Preliminar
-
+        double u = normMinkowski2(pMother1 - pt);
         double t = normMinkowski2(b - pt);
         double ckm2= ckm[pMother1_PID][p3_PID]*ckm[pMother1_PID][p3_PID];
-        double scal = -0.25*gW4*ckm1*ckm2*2/((t - mW2)*(t - mW2));
+        double scal = -0.25*gW4*ckm1*ckm2*2*u/((t - mW2)*(t - mW2));
         //TLorentzVector test (1.,1.,1.,1.);
 
         //return Mbqbar_mu
