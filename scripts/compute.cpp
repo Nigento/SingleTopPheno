@@ -11,9 +11,11 @@ using namespace std;
 
 int main (){
   double asym;
-
-  TFile* File = TFile::Open("/home/sane/Stage_M1/LIVMass-master/results/Modulation_Temporelle_13TeV_b60.root");
-  TFile* Save = new TFile ("Asymmetry.root","update");
+  string b_mu;
+  cout<<"Give the value of b_mu you used for the data you want to study"<<endl;
+  cin>>b_mu;
+  TFile* File = TFile::Open("/home/sane/Stage_M1/LIVMass-master/results/Modulation_Temporelle_13TeV.root");
+  TFile* Save = new TFile ("Asymmetry.root","RECREATE");
   TCanvas * modul = new TCanvas("Asymmetry", "Simple graph", 450 , 450);
   TH2F* axe = new TH2F (" ", " ", 49 ,0,24,100,0,0.4 );
   auto legend = new TLegend(0.75,0.15,0.95,0.35);
@@ -37,6 +39,11 @@ int main (){
 
   double Xsect = 12.26;
   double Xsectbar = 7.004;
+
+  cout<<"Give the Xsect of the top production events"<<endl;
+  cin>>Xsect;
+  cout<<"Give the Xsect of the anti-top production events"<<endl;
+  cin>>Xsectbar;
   double l = 0;
 for (int i = 0; i<=48; i++ )
   {
@@ -45,9 +52,10 @@ for (int i = 0; i<=48; i++ )
     cout<<"Asymx="<<asym<<endl;
     l+=0.5;
   }
+  string name = "bx = "+b_mu+" GeV";
   Asym->SetLineColor(kOrange);
   Asym->Write("tX");
-  legend->AddEntry(Asym,"bx = 10 GeV", "l");
+  legend->AddEntry(Asym,name.c_str(), "l");
   Asym->Draw("Same");
 
   Parti = (TGraph*)File->Get("tY");
@@ -65,7 +73,8 @@ for (int i = 0; i<=48; i++ )
   }
   Asym->SetLineColor(kRed);
   Asym->Write("tY");
-  legend->AddEntry(Asym,"by = 10 GeV", "l");
+  name = "by = "+b_mu+" GeV";
+  legend->AddEntry(Asym,name.c_str(), "l");
   Asym->Draw("Same");
 
 
@@ -85,7 +94,8 @@ l=0;
   }
   Asym->SetLineColor(kBlue);
   Asym->Write("tZ");
-  legend->AddEntry(Asym,"bz = 10 GeV", "l");
+  name = "bz = "+b_mu+" GeV";
+  legend->AddEntry(Asym,name.c_str(), "l");
   Asym->Draw("Same");
 
 
@@ -104,7 +114,8 @@ l=0;
   }
   Asym->SetLineColor(kGreen);
   Asym->Write("tT");
-  legend->AddEntry(Asym,"bt = 10 GeV", "l");
+  name = "bt = "+b_mu+" GeV";
+  legend->AddEntry(Asym,name.c_str(), "l");
   legend->Draw("Same");
   Asym->Draw("Same");
 

@@ -7,14 +7,26 @@
 #include <TGraph.h>
 #include <TH2F.h>
 #include <TLegend.h>
-
+#include <sstream>
 using namespace std;
 
 int main (){
+  TString diagram;
+  cout<<"We consider an energy in the center-of-mass of 13 TeV for both t-channel and tw-channel"<<endl;
+  do {
+    cout<<"Choose which channel you wish to study within the 4 diagrams available :"<<endl
+    <<"t - t-channel through b and q diffusion"<<endl
+    <<"tw - tW-channel"<<endl
+    <<"tbar - tbar-channel through antib and q diffusion"<<endl
+    <<"tbarw - tbarW-channel"<<endl;
+    cin>>diagram;}
+  while (diagram !="t" && diagram !="tw" && diagram !="tbar" && diagram !="tbarw" );
+
+
 
   // Some needed variables
   int choice;
-  TString diagram;
+
   int nbtqprecut = 0;
   int nbtqbarprecut = 0;
   int nbtq = 0;
@@ -30,15 +42,7 @@ int main (){
   TLorentzVector WtAv(0., 0., 0., 0.);
 
   //Choose the channel and diagram we want to study.
-  cout<<"We consider an energy in the center-of-mass of 13 TeV for both t-channel and tw-channel"<<endl;
-  do {
-    cout<<"Choose which channel you wish to study within the 4 diagrams available :"<<endl
-    <<"t - t-channel through b and q diffusion"<<endl
-    <<"tw - tW-channel"<<endl
-    <<"tbar - tbar-channel through antib and q diffusion"<<endl
-    <<"tbarw - tbarW-channel"<<endl;
-    cin>>diagram;}
-  while (diagram !="t" && diagram !="tw" && diagram !="tbar" && diagram !="tbarw" );
+
 
   root_simu* go;
 
@@ -180,9 +184,6 @@ double pourctq = 1.0*nbtqprecut/1000000;
 double pourctqbar = 1.0*nbtqbarprecut/1000000;
 //If Wtw != 0 then Wtq and Wtqbar should be 0
 
-/*cout<<"Somme des W(t)"<<endl;
-for (int i=0;i<4;i++){cout<<Wtq[i]<<endl;}
-cout<<"nb="<<nb<<endl;*/
 
 if (diagram == "t"){
   WtAv =pourctq*Wtq*ratiotq + pourctqbar*Wtqbar*ratiotqbar;
@@ -217,6 +218,28 @@ if (diagram == "tbarw" ){
 }
 
 //________________Macro creating the f(t) graph using root_______________//
+string b_mu;
+cout<<"Enter your b_mu value"<<endl;
+cin>>b_mu;
+
+double b_muvalue = atof(b_mu.c_str());
+//string buff = to_string(b_mu);
+string nameFile = "Modulation_Temporelle_13TeV_b"+b_mu+".root";
+TLorentzVector b_mu0 (b_muvalue, 0., 0., 0.);
+TLorentzVector b_mu1 (0., b_muvalue, 0., 0.);
+TLorentzVector b_mu2 (0., 0., b_muvalue, 0.);
+TLorentzVector b_mu3 (0., 0., 0., b_muvalue);
+
+TFile* File = new TFile (nameFile.c_str(), "UPDATE");
+
+
+
+auto legend = new TLegend(0.75,0.75,0.95,0.95);
+TGraph* graphx = new TGraph (48);
+TGraph* graphy = new TGraph (48);
+TGraph* graphz = new TGraph (48);
+TGraph* grapht = new TGraph (48);
+//TGraph* graphSM = new TGraph(48);
 
 double ft = 0;
 double xi_1 = sin(46.309)*cos(101.290);
@@ -225,107 +248,96 @@ double xi_3 = cos(46.309)*cos(101.2790);
 
 
 
-TLorentzVector b_mu0 (5, 0., 0., 0.);
-TLorentzVector b_mu1 (0., 5, 0., 0.);
-TLorentzVector b_mu2 (0., 0., 5, 0.);
-TLorentzVector b_mu3 (0., 0., 0., 5);
-
 double min,max;
 if (diagram == "t" || diagram == "tbar")
-{min = -0.13; max = 0.13;}
+{min = -0.01; max = 0.01;}
 
 if (diagram == "tw" || diagram == "tbarw")
-{min = -0.5; max = 0.5  ;}
+{min = -0.05; max =0.05;}
 
-TFile* File = new TFile ("Modulation_Temporelle_13TeV_b5.root", "update");
-TCanvas* modul = new TCanvas("Modulation", "Simple graph", 600 , 600);
-TH2F* axe = new TH2F (" ", " ", 49 ,0,24,49,min, max);
-auto legend = new TLegend(0.75,0.75,0.95,0.95);
-TGraph* graph = new TGraph (48);
-TString name;
-modul->SetLeftMargin(0.14);
-modul->SetRightMargin(0.03);
-axe->SetStats(kFALSE);
-axe->Draw();
-axe->GetXaxis()->SetTitle("t (h)");
-axe->GetYaxis()->SetTitle("f(t) = SME/SM -1");
-axe->GetXaxis()->CenterTitle(kTRUE);
-axe->GetYaxis()->CenterTitle(kTRUE);
-//axe->GetYaxis()->SetTitleOffset(0.8);
-File->cd();
-
-//Save points to Modulation_Temporelle.root and plot the graph at the same time//
-
-//X = 10 Benchmark
 int i = 0;
 for (double t=0; t<=24 ; t+=0.5)
 {
   ft = b_mu0[3]*WtAv[3] - b_mu0[0]*(xi_1*cos(2*M_PI/24*t)+xi_2*sin(2*M_PI/24*t))*WtAv[2]+b_mu0[1]*(xi_2*cos(2*M_PI/24*t)-xi_1*sin(2*M_PI/24*t))*WtAv[2]+b_mu0[2]*xi_3*WtAv[2];
-  graph->SetPoint(i, t, ft);
-  i++;
-}
-graph->SetLineColor(kOrange);
-graph->Write(diagram+"X");
-legend->AddEntry(graph,"bx = 10 GeV", "l");
-graph->Draw("Same");
-
-//Y = 10 Benchmark
-i = 0;
-graph = new TGraph (48);
-for (double t=0; t<=24 ; t+=0.5)
-{
+  graphx->SetPoint(i, t, ft);
+  if (ft>max) {do {max += 0.3;} while (ft>max);};
+  if (ft<min) {do {min -=0.3;} while (ft<min);};
+  cout<<"min="<<min<<"  max="<<max<<endl;
   ft = b_mu1[3]*WtAv[3] - b_mu1[0]*(xi_1*cos(2*M_PI/24*t)+xi_2*sin(2*M_PI/24*t))*WtAv[2]+b_mu1[1]*(xi_2*cos(2*M_PI/24*t)-xi_1*sin(2*M_PI/24*t))*WtAv[2]+b_mu1[2]*xi_3*WtAv[2];
-  graph->SetPoint(i, t, ft);
-  i++;
-}
-graph->SetLineColor(kRed);
-graph->Write(diagram+"Y");
-legend->AddEntry(graph,"by = 10 GeV", "l");
-graph->Draw("Same");
-
-//Z = 10 Benchmark
-i = 0;
-graph = new TGraph (48);
-for (double t=0; t<=24 ; t+=0.5)
-{
+  graphy->SetPoint(i, t, ft);
+  if (ft>max) {do {max += 0.3;} while (ft>max);};
+  if (ft<min) {do {min -=0.3;} while (ft<min);};
+    cout<<"min="<<min<<"  max="<<max<<endl;
   ft = b_mu2[3]*WtAv[3] - b_mu2[0]*(xi_1*cos(2*M_PI/24*t)+xi_2*sin(2*M_PI/24*t))*WtAv[2]+b_mu2[1]*(xi_2*cos(2*M_PI/24*t)-xi_1*sin(2*M_PI/24*t))*WtAv[2]+b_mu2[2]*xi_3*WtAv[2];
-  graph->SetPoint(i, t, ft);
-  i++;
-}
-graph->SetLineColor(kBlue);
-legend->AddEntry(graph,"bz = 10 GeV", "l");
-graph->Write(diagram+"Z");
-graph->Draw("Same");
-
-//t = 10 Benchmark
-i = 0;
-graph = new TGraph (48);
-for (double t=0; t<=24 ; t+=0.5)
-{
+  graphz->SetPoint(i, t, ft);
+  if (ft>max) {do {max += 0.3;} while (ft>max);};
+  if (ft<min) {do {min -=0.3;} while (ft<min);};
+  cout<<"min="<<min<<"  max="<<max<<endl;
   ft = b_mu3[3]*WtAv[3] - b_mu3[0]*(xi_1*cos(2*M_PI/24*t)+xi_2*sin(2*M_PI/24*t))*WtAv[2]+b_mu3[1]*(xi_2*cos(2*M_PI/24*t)-xi_1*sin(2*M_PI/24*t))*WtAv[2]+b_mu3[2]*xi_3*WtAv[2];
-  graph->SetPoint(i, t, ft);
+  grapht->SetPoint(i, t, ft);
+  if (ft>max) {do {max += 0.3;} while (ft>max);};
+  if (ft<min) {do {min -=0.3;} while (ft<min);};
+  cout<<"min="<<min<<"  max="<<max<<endl;
   i++;
 }
-graph->SetLineColor(kGreen);
-graph->Write(diagram+"T");
-legend->AddEntry(graph,"bt = 10 GeV", "l");
-graph->Draw("Same");
 
 
-/*graph = new TGraph (48);
-for (double t=0; t<=24 ; t+=0.5)
+string namex = "bx = "+b_mu+" GeV";
+string namey = "by = "+b_mu+" GeV";
+string namez = "bz = "+b_mu+" GeV";
+string namet = "bt = "+b_mu+" GeV";
+
+graphx->SetLineColor(kOrange);
+graphy->SetLineColor(kRed);
+graphz->SetLineColor(kBlue);
+grapht->SetLineColor(kGreen);
+
+legend->AddEntry(graphx,namex.c_str(), "l");
+legend->AddEntry(graphy,namey.c_str(), "l");
+legend->AddEntry(graphz,namez.c_str(), "l");
+legend->AddEntry(grapht,namet.c_str(), "l");
+
+
+File->cd();
+graphx->Write(diagram+"X");
+graphy->Write(diagram+"Y");
+graphz->Write(diagram+"Z");
+grapht->Write(diagram+"T");
+
+File->Close();
+
+/*for (double t=0; t<=24 ; t+=0.5)
 {
   ft = 0;
-  graph->SetPoint(i, t, ft);
+  graphSM->SetPoint(i, t, ft);
   i++;
-}*/
-/*graph->SetLineColor(kBlack);
-graph->Write(diagram+"SM");
-legend->AddEntry(graph,"SM", "l");
-graph->Draw("Same");*/
+}
+
+graphSM->SetLineColor(kBlack);
+graphSM->Write(diagram+"SM");
+legend->AddEntry(graphSM,"SM", "l");*/
+
+TCanvas* modul = new TCanvas("Modulation", "", 600 , 600);
+modul->SetLeftMargin(0.14);
+modul->SetRightMargin(0.03);
+TH2F* axe = new TH2F (" ", " ",49 ,0 ,24 ,49 ,min ,max );
+
+axe->SetStats(kFALSE);
+axe->GetYaxis()->SetTitleOffset(2.0);
+axe->GetXaxis()->SetTitle("t (h)");
+axe->GetYaxis()->SetTitle("f(t) = SME/SM -1");
+axe->GetXaxis()->CenterTitle(kTRUE);
+axe->GetYaxis()->CenterTitle(kTRUE);
+axe->Draw("SAME");
+graphx->Draw("SAME");
+graphy->Draw("SAME");
+graphz->Draw("SAME");
+grapht->Draw("SAME");
+//graphSM->Draw("SAME");
+legend->Draw("SAME");
 
 
-legend->Draw("Same");
 modul->SaveAs("Modulation_"+diagram+".pdf");
+
 return 0;
 }
