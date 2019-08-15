@@ -10,27 +10,29 @@
 #include <TGraph.h>
 #include <TF1.h>
 #include <TH1F.h>
-#include <TLatex.h>
+#include <TLine.h>
 
 using namespace std;
 int main ()
 {
 
-  TFile* Filet = TFile::Open("/home/sane/Stage_M1/LIVMass-master/results/histo/hist_tchannel_Xcarre.root");
+  TFile* Filet = TFile::Open("../results/histo/hist_tchannel_Xcarre.root");
   TCanvas* feuille = new TCanvas ("", "", 450, 450);
-  TFile* Filetbar = TFile::Open("/home/sane/Stage_M1/LIVMass-master/results/histo/hist_tbarchannel_Xcarre.root");
-  //TFile* ft = TFile::Open("/home/sane/Stage_M1/LIVMass-master/results/Modulation_Temporelle_13TeV.root");
+  TFile* Filetbar = TFile::Open("../results/histo/hist_tbarchannel_Xcarre.root");
 
   feuille->SetLeftMargin(0.14);
   feuille->SetRightMargin(0.03);
   auto legend = new TLegend(0.65,0.75,0.90,0.85);
-
   double range = 7;
+
+  //change the value to 1 + % of incertitude to get the value of Xcarre with syst_error
+
   double systttbar = 1.0;
-  double systmulti = 0.974;
+  double systmulti = 1.0;
   double systsingletop = 1.0;
+  double systSingleTopbar = 1.0;
   double systelectro = 1.0;
-  double lumi = 1.0 ;
+  double lumi = 1.0;
 
   TH1F* datt = (TH1F*)Filet->Get("Asimov");
   TH1F* Sigt = (TH1F*)Filet->Get("Modulation_t");
@@ -59,13 +61,13 @@ int main ()
   double ttbartbarbkg = ttbartbar->GetBinContent(1)*systttbar;
   double multijettbarbkg = multijettbar->GetBinContent(1)*systmulti;
   double electroweaktbarbkg = electroweaktbar->GetBinContent(1)*systelectro;
-  double SingleTopSMtbarbkg = SingleTopSMtbar->GetBinContent(1)*systsingletop;
+  double SingleTopSMtbarbkg = SingleTopSMtbar->GetBinContent(1)*systSingleTopbar;
 
   double sigmatott = sqrt(lumi*(ttbartbkg+multijettbkg+electroweaktbkg+SingleTopSMtbkg));
   double sigmatottbar = sqrt(lumi*(ttbartbarbkg+multijettbarbkg+electroweaktbarbkg+SingleTopSMtbarbkg));
 
   chiCarre->GetXaxis()->SetTitle("b_{#mu} (GeV)");
-  chiCarre->GetYaxis()->SetTitle("#Delta#chi^{2}");
+  chiCarre->GetYaxis()->SetTitle("#delta#chi^{2}");
   chiCarre->GetXaxis()->CenterTitle(kTRUE);
   chiCarre->GetYaxis()->CenterTitle(kTRUE);
   chiCarre->SetStats(kFALSE);
@@ -82,13 +84,11 @@ int main ()
 
     for (int p=1; p<26; p++)
     {
-
-      //bsign += (datt->GetBinContent(p)-lumi*((i*Sig->GetBinContent(p)+1)*SingleTopSMt->GetBinContent(p)+ttbart->GetBinContent(p)+electroweakt->GetBinContent(p)+multijett->GetBinContent(p)))*(datt->GetBinContent(p)-lumi*((i*Sig->GetBinContent(p)+1)*SingleTopSMt->GetBinContent(p)+ttbart->GetBinContent(p)+electroweakt->GetBinContent(p)+multijett->GetBinContent(p)));
       tchannel += (asimovt-lumi*((i*Sigt->GetBinContent(p)+1)*SingleTopSMtbkg+ttbartbkg+electroweaktbkg+multijettbkg))*(asimovt-lumi*((i*Sigt->GetBinContent(p)+1)*SingleTopSMtbkg+ttbartbkg+electroweaktbkg+multijettbkg));
       tbarchannel += (asimovtbar-lumi*((i*Sigtbar->GetBinContent(p)+1)*SingleTopSMtbarbkg+ttbartbarbkg+electroweaktbarbkg+multijettbarbkg))*(asimovtbar-lumi*((i*Sigtbar->GetBinContent(p)+1)*SingleTopSMtbarbkg+ttbartbarbkg+electroweaktbarbkg+multijettbarbkg));
     }
-    chiCarre->SetBinContent(bin,tchannel*dividet+tchannel*dividetbar);
-    //chiCarre->SetBinContent(bin,tchannel*dividet);
+
+    chiCarre->SetBinContent(bin,tchannel*dividet+tbarchannel*dividetbar);
     bin++;
   }
   TFile* Xroot = new TFile("XCarre.root","RECREATE");
@@ -96,27 +96,30 @@ int main ()
   chiCarre->Fit(fithist,"R");
   cout<<"Delta Chi at 1 GeV = "<<fithist->GetX(chiCarre->GetBinContent(chiCarre->GetMinimumBin())+1)<<endl;
 
-  //chiCarre->SetLineColor(kBLACK);
+  chiCarre->SetLineColor(kRed);
   chiCarre->Draw();
-  legend->AddEntry(chiCarre, "#chi_{tot}^{2} = #chi_{t}^{2} + #chi_{#bar{t}}^{2}", "l");
+  legend->AddEntry(chiCarre, "#chi_{tot}^{2} = #chi_{t}^{2} +#chi_{#bar{t}}^{2}", "l");
 
 
-/*  chiCarre = new TH1F ("Chi Carre", "" , range*2/0.0001, -range, range);
-  lumi=1.02;
-  sigmatot = sqrt(lumi*(ttbartbkg+multijettbkg+electroweaktbkg+SingleTopSMtbkg));
+  /*chiCarre = new TH1F ("Chi Carre", "" , range*2/0.0001, -range, range);
+  lumi=1.025;
+  dividet = 1.0/(sigmatott*sigmatott*24);
+  dividetbar = 1.0/(sigmatottbar*sigmatottbar*24);
 
   double buff=0;
   bin = 1;
 
   for (double i = -range ; i<range-0.0001; i+=0.0001)
   {
-    double bsign = 0;
 
+    double tchannel = 0;
+    double tbarchannel = 0;
     for (int p=1; p<26; p++)
     {
-      bsign += (asimov-lumi*((i*Sig->GetBinContent(p)+1)*SingleTopSMtbkg+ttbartbkg+electroweaktbkg+multijettbkg))*(asimov-lumi*((i*Sig->GetBinContent(p)+1)*SingleTopSMtbkg+ttbartbkg+electroweaktbkg+multijettbkg));
+      tchannel += (asimovt-lumi*((i*Sigt->GetBinContent(p)+1)*SingleTopSMtbkg+ttbartbkg+electroweaktbkg+multijettbkg))*(asimovt-lumi*((i*Sigt->GetBinContent(p)+1)*SingleTopSMtbkg+ttbartbkg+electroweaktbkg+multijettbkg));
+      tbarchannel += (asimovtbar-lumi*((i*Sigtbar->GetBinContent(p)+1)*SingleTopSMtbarbkg+ttbartbarbkg+electroweaktbarbkg+multijettbarbkg))*(asimovtbar-lumi*((i*Sigtbar->GetBinContent(p)+1)*SingleTopSMtbarbkg+ttbartbarbkg+electroweaktbarbkg+multijettbarbkg));
     }
-    chiCarre->SetBinContent(bin,bsign*divide);
+    chiCarre->SetBinContent(bin,tchannel*dividet+tbarchannel*dividetbar);
     //cout<<chiCarre->GetBinContent(bin)<<endl;
     bin++;
   }
@@ -135,22 +138,25 @@ int main ()
   chiCarre->SetLineColor(kBlue);
   chiCarre->Draw("SAME");
   chiCarre->Write("XCarre+");
-  legend->AddEntry(chiCarre, "Luminosity = 1.02", "l");
+  legend->AddEntry(chiCarre, "Luminosity = 154 fb^{-1}", "l");
   chiCarre = new TH1F ("Chi Carre", "" , range*2/0.0001, -range, range);
   buff=0;
 
-  lumi = 0.98;
-  sigmatot = sqrt(lumi*(ttbartbkg+multijettbkg+electroweaktbkg+SingleTopSMtbkg));
+  lumi = 0.975;
+  dividet = 1.0/(sigmatott*sigmatott*24);
+  dividetbar = 1.0/(sigmatottbar*sigmatottbar*24);
   bin=1;
   for (double i = -range ; i<range-0.0001; i+=0.0001)
   {
-    double bsign = 0;
+    double tchannel = 0;
+    double tbarchannel = 0;
 
     for (int p=1; p<26; p++)
     {
-      bsign += (asimov-lumi*((i*Sig->GetBinContent(p)+1)*SingleTopSMtbkg+ttbartbkg+electroweaktbkg+multijettbkg))*(asimov-lumi*((i*Sig->GetBinContent(p)+1)*SingleTopSMtbkg+ttbartbkg+electroweaktbkg+multijettbkg));
+      tchannel += (asimovt-lumi*((i*Sigt->GetBinContent(p)+1)*SingleTopSMtbkg+ttbartbkg+electroweaktbkg+multijettbkg))*(asimovt-lumi*((i*Sigt->GetBinContent(p)+1)*SingleTopSMtbkg+ttbartbkg+electroweaktbkg+multijettbkg));
+      tbarchannel += (asimovtbar-lumi*((i*Sigtbar->GetBinContent(p)+1)*SingleTopSMtbarbkg+ttbartbarbkg+electroweaktbarbkg+multijettbarbkg))*(asimovtbar-lumi*((i*Sigtbar->GetBinContent(p)+1)*SingleTopSMtbarbkg+ttbartbarbkg+electroweaktbarbkg+multijettbarbkg));
     }
-    chiCarre->SetBinContent(bin,bsign*divide);
+    chiCarre->SetBinContent(bin,tchannel*dividet+tbarchannel*dividetbar);
     bin++;
   }
   cout<<"Delta Chi at 1 GeV = "<<fithist->GetX(chiCarre->GetBinContent(chiCarre->GetMinimumBin())+1)<<endl;
@@ -165,10 +171,15 @@ int main ()
   chiCarre->SetLineColor(kRed);
   chiCarre->Draw("SAME");
   chiCarre->Write("XCarre-");
-  legend->AddEntry(chiCarre, "Luminosity = 0.98", "l");*/
+  legend->AddEntry(chiCarre, "Luminosity = 146 fb^{-1}", "l");*/
   legend->Draw();
-
-  feuille->SaveAs("XCarre.pdf");
+  TLine* deltaChi = new TLine (-7, 1, 7, 1);
+  TLine* deltaChiPlus = new TLine (-abs(fithist->GetX(chiCarre->GetBinContent(chiCarre->GetMinimumBin())+1)), 0, -abs(fithist->GetX(chiCarre->GetBinContent(chiCarre->GetMinimumBin())+1)) , 1);
+  TLine* deltaChiMoins = new TLine (abs(fithist->GetX(chiCarre->GetBinContent(chiCarre->GetMinimumBin())+1)), 0, abs(fithist->GetX(chiCarre->GetBinContent(chiCarre->GetMinimumBin())+1)), 1);
+  deltaChi->Draw();
+  deltaChiPlus->Draw();
+  deltaChiMoins->Draw();
+  feuille->SaveAs("../results/graph/XCarre.pdf");
   Xroot->Close();
   return 0;
 }

@@ -13,9 +13,9 @@ using namespace std;
 int main ()
 {
   TCanvas * energy = new TCanvas("", "Simple graph", 450 , 450);
-  //energy->SetLogx();
+  energy->SetLogx();
 
-  TH2F* axe = new TH2F (" ", "", 7 ,2,150,7, 0,0.6);
+  TH2F* axe = new TH2F (" ", "", 7 ,2,150,7, 0,0.1);
   auto legend = new TLegend(0.6,0.15,0.85,0.25);
   axe->SetMarkerStyle(22);
   axe->SetStats(kFALSE);
@@ -27,31 +27,31 @@ int main ()
   axe->GetYaxis()->SetTitleOffset(1.35);
   axe->Draw();
 
-  /*TGraph* Depend = new TGraph (7);
+  TGraph* Depend = new TGraph (7);
   //tw dependency
   Depend->SetMarkerSize(1);
-  Depend->SetPoint(0,2,0.0892);
-  Depend->SetPoint(1,7,0.211);
-  Depend->SetPoint(2,13,0.284);
-  Depend->SetPoint(3,14,0.296);
-  Depend->SetPoint(4,27,0.371);
-  Depend->SetPoint(5,100,0.496);
-  Depend->SetPoint(6,150,0.539942);*/
-  TGraph* Depend = new TGraph (7);
+  Depend->SetPoint(0,2,0.00892);
+  Depend->SetPoint(1,7,0.0211);
+  Depend->SetPoint(2,13,0.0284);
+  Depend->SetPoint(3,14,0.0296);
+  Depend->SetPoint(4,27,0.0371);
+  Depend->SetPoint(5,100,0.0496);
+  Depend->SetPoint(6,150,0.0539942);
+  //TGraph* Depend = new TGraph (7);
   //t Energy_Dependency
-  Depend->SetMarkerSize(1);
-  Depend->SetPoint(0,2,0.310268);
-  Depend->SetPoint(1,7,0.326407);
-  Depend->SetPoint(2,13,0.33236);
-  Depend->SetPoint(3,14,0.334275);
-  Depend->SetPoint(4,27,0.335135);
-  Depend->SetPoint(5,100,0.330827);
-  Depend->SetPoint(6,150,0.329096);
+  /*Depend->SetMarkerSize(1);
+  Depend->SetPoint(0,2,0.276621);
+  Depend->SetPoint(1,7,0.278291);
+  Depend->SetPoint(2,13,0.278911);
+  Depend->SetPoint(3,14,0.279102);
+  Depend->SetPoint(4,27,0.279197);
+  Depend->SetPoint(5,100,0.278734);
+  Depend->SetPoint(6,150,0.27855);*/
 
 
 
   Depend->SetLineColor(kRed);
-  legend->AddEntry(Depend, "bx = 10 GeV", "l");
+  legend->AddEntry(Depend, "b_{x} = 1 GeV", "l");
   Depend->Draw("Same");
   Depend->Draw("*");
   legend->Draw("Same");

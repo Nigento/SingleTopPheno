@@ -1,5 +1,6 @@
 #include  "../include/root_simu.hpp"
 #include  "../include/matrixSingleTop.hpp"
+#include "../include/Analyzetw.hpp"
 #include <TCanvas.h>
 #include <iostream>
 #include <vector>
@@ -20,7 +21,7 @@ int main (){
     <<"tbar - tbar-channel through antib and q diffusion"<<endl
     <<"tbarw - tbarW-channel"<<endl;
     cin>>diagram;}
-  while (diagram !="t" && diagram !="tw" && diagram !="tbar" && diagram !="tbarw" );
+  while (diagram !="t" && diagram !="cw" && diagram !="tbar" && diagram !="tbarw" );
 
 
 
@@ -43,137 +44,158 @@ int main (){
 
   //Choose the channel and diagram we want to study.
 
-
-  root_simu* go;
-
   //Extract the corresponding rootfile
-  if (diagram == "t")
-    go = new root_simu("SingleToptchan.root");
-  if (diagram == "tw")
-    go = new root_simu("SingleToptwchan.root");
-  if (diagram == "tbar")
-    go = new root_simu("SingleToptbarchan.root");
-  if (diagram == "tbarw")
-    go = new root_simu("SingleToptbarwchan.root");
-  go->Loop();
-  int Events = go->fChain->GetEntriesFast();
+  if (diagram == "t" || diagram == "tbar")
+  {
+    root_simu* go;
+    if (diagram == "t")
+    go = new root_simu("1Mt13TeV.root");
+    if (diagram == "tbar")
+    go = new root_simu("1Mtbar13TeV.root");
+    go->Loop();
+    int Events = go->fChain->GetEntriesFast();
 
-  //Declare the variable to sum the values of the matrix elements for each iteration
-  for (int i=0; i<Events; i++){
+    //Declare the variable to sum the values of the matrix elements for each iteration
+    for (int i=0; i<Events; i++){
 
-    if (go->nature!=0) {
-      MatrixSingleTop *M = new MatrixSingleTop(go->pMother1[i], go->b[i], go->pt[i], go->p3[i], go->pMother1_PID[i], go->p3_PID[i], go->nature[i], go->pTmu[i], go->etamu[i], go->pTelec[i], go->etaElec[i]);
-      choice = go->nature[i];
-        //Treat t-channel in the case of tq and tbarq
-        if (choice == 1) {
-          nbtqprecut++;
-          if (go->etaElec[i]<1.479 && go->pTelec[i]>35){
+      if (go->nature!=0) {
+        MatrixSingleTop *M = new MatrixSingleTop(go->pMother1[i], go->b[i], go->pt[i], go->p3[i], go->pMother1_PID[i], go->p3_PID[i], go->b_PID[i], go->nature[i], go->pTmu[i], go->etamu[i], go->pTelec[i], go->etaElec[i]);
+        choice = go->nature[i];
+          //Treat t-channel in the case of tq and tbarq
+          if (choice == 1) {
+            nbtqprecut++;
+            if (go->etaElec[i]<1.479 && go->pTelec[i]>35){
 
-            if (diagram == "t")
-            {
-              SME = M->getMbq_mu();
+              if (diagram == "t")
+              {
+                SME = M->getMbq_mu();
+              }
+              if (diagram == "tbar")
+              {
+                SME = -1.0*M->getMbq_mu();
+              }
+
+              SM  = M->getMbq();
+              ratio = 1/SM;
+              Wtq+=SME*ratio;//Sum each calculated change ratio at each iteration
+              nbtq++;         //Count the number of time we calculate a charge ratio to calculate the mean value later
             }
-            if (diagram == "tbar")
-            {
-              SME = -1.0*M->getMbq_mu();
-            }
-
-            SM  = M->getMbq();
-            ratio = 1/SM;
-            Wtq+=SME*ratio;//Sum each calculated change ratio at each iteration
-            nbtq++;         //Count the number of time we calculate a charge ratio to calculate the mean value later
+             else {if (go->etamu[i]<2.4 && go->pTmu[i]>26){
+               if (diagram == "t")
+               {
+                 SME = M->getMbq_mu();
+               }
+               if (diagram == "tbar")
+               {
+                 SME = -1.0*M->getMbq_mu();
+               }
+              SM  = M->getMbq();
+              ratio = 1/SM;
+              Wtq+=SME*ratio;
+              nbtq++;
+            }}
           }
-           else {if (go->etamu[i]<2.4 && go->pTmu[i]>26){
-             if (diagram == "t")
-             {
-               SME = M->getMbq_mu();
-             }
-             if (diagram == "tbar")
-             {
-               SME = -1.0*M->getMbq_mu();
-             }
-            SM  = M->getMbq();
-            ratio = 1/SM;
-            Wtq+=SME*ratio;
-            nbtq++;
-          }}
-        }
 
-        //Treat t-channel in the case of tqbar and tbarqbar
-        if (choice == 2 ){
-          nbtqbarprecut++;
-          if (go->etaElec[i]<1.479 && go->pTelec[i]>35){
-            if (diagram == "t")
-            {
-              SME = M->getMbqbar_mu();
-            }
-            if (diagram == "tbar")
-            {
-              SME = -1.0*M->getMbqbar_mu();
-            }
-            SM  = M->getMbqbar();
-            /*cout<<"SMtbarq ="<<SM<<endl;
-            for (int i=0; i<4;i++)
-            {
-              cout<<"SM"<<i<<"="<<SME[i]<<endl;
-            }*/
-            ratio = 1/SM;
-            Wtqbar+=SME*ratio;
-            nbtqbar++;
-            }
-          else {if (go->etamu[i]<2.4 && go->pTmu[i]>26){
-            if (diagram == "t")
-            {
-              SME = M->getMbqbar_mu();
-            }
-            if (diagram == "tbar")
-            {
-              SME = -1.0*M->getMbqbar_mu();
-            }
+          //Treat t-channel in the case of tqbar and tbarqbar
+          if (choice == 2 ){
+            nbtqbarprecut++;
+            if (go->etaElec[i]<1.479 && go->pTelec[i]>35){
+              if (diagram == "t")
+              {
+                SME = M->getMbqbar_mu();
+              }
+              if (diagram == "tbar")
+              {
+                SME = -1.0*M->getMbqbar_mu();
+              }
+              SM  = M->getMbqbar();
+              /*cout<<"SMtbarq ="<<SM<<endl;
+              for (int i=0; i<4;i++)
+              {
+                cout<<"SM"<<i<<"="<<SME[i]<<endl;
+              }*/
+              ratio = 1/SM;
+              Wtqbar+=SME*ratio;
+              nbtqbar++;
+              }
+            else {if (go->etamu[i]<2.4 && go->pTmu[i]>26){
+              if (diagram == "t")
+              {
+                SME = M->getMbqbar_mu();
+              }
+              if (diagram == "tbar")
+              {
+                SME = -1.0*M->getMbqbar_mu();
+              }
 
-            SM  = M->getMbqbar();
-            ratio = 1/SM;
-            Wtqbar+=SME*ratio;
-            nbtqbar++;
-          }}
-        }
+              SM  = M->getMbqbar();
+              ratio = 1/SM;
+              Wtqbar+=SME*ratio;
+              nbtqbar++;
+            }}
+      }
 
-        //Ttreat tW-channel in the case of t and tbar
-        if(choice == 3){
-          if (go->etaElec[i]<2.4 && go->pTelec[i]>20){
-            if (diagram == "tbarw")
-            {
-              SME = -1.0*M->getMbg_mu();
-            }
-            if (diagram == "tw")
-            {
-              SME = M->getMbg_mu();
-            }
-            SM  = M->getMbg();
-            ratio = 1/SM;
-            Wtw+=SME*ratio;
-            nbtw++;}
+      delete M;
 
-          else {if (go->etamu[i]<2.4 && go->pTmu[i]>20){
-            if (diagram == "tbarw")
-            {
-              SME = -1.0*M->getMbg_mu();
-            }
-            if (diagram == "tw")
-            {
-              SME = M->getMbg_mu();
-            }
-            SM  = M->getMbg();
-            ratio = 1/SM;
-            Wtw+=SME*ratio;
-            nbtw++;
-          }}
-        }
-
-    delete M;
-
+    }
   }
-}
+  }
+
+  if (diagram == "tw" || diagram == "tbarw")
+  {
+    Analyzetw* go;
+    if (diagram == "tw")
+    go = new Analyzetw("1Mtw13TeV.root");
+    if (diagram == "tbarw")
+    go = new Analyzetw("tbarwchan_13TeV_fixed.root");
+    go->Loop();
+    int Events = go->fChain->GetEntriesFast();
+
+    //Declare the variable to sum the values of the matrix elements for each iteration
+    for (int i=0; i<Events; i++){
+
+
+      if (go->nature!=0) {
+        MatrixSingleTop *M = new MatrixSingleTop(go->pMother1[i], go->b[i], go->pt[i], go->p3[i], go->pMother1_PID[i], go->p3_PID[i], go->b_PID[i], go->nature[i], go->pTmu[i], go->etamu[i], go->pTelec[i], go->etaElec[i]);
+        choice = go->nature[i];
+
+          //Ttreat tW-channel in the case of t and tbar
+          if(choice == 3){
+            if (go->etaElec[i]<2.4 && go->pTelec[i]>20){
+              if (diagram == "tbarw")
+              {
+                SME = -1.0*M->getMbg_mu();
+              }
+              if (diagram == "tw")
+              {
+                SME = M->getMbg_mu();
+              }
+              SM  = M->getMbg();
+              ratio = 1/SM;
+              Wtw+=SME*ratio;
+              nbtw++;}
+
+            else {if (go->etamu[i]<2.4 && go->pTmu[i]>20){
+              if (diagram == "tbarw")
+              {
+                SME = -1.0*M->getMbg_mu();
+              }
+              if (diagram == "tw")
+              {
+                SME = M->getMbg_mu();
+              }
+              SM  = M->getMbg();
+              ratio = 1/SM;
+              Wtw+=SME*ratio;
+              nbtw++;
+            }}
+          }
+
+      delete M;
+
+    }
+  }
+  }
 
 //Calcuate the charge ratio considering we have different diagram for a single generation
 //When we simule tq and so tqbar, we have different cross-sect for tq and tqbar. The following expression weights each calculated matrix element.
@@ -189,14 +211,14 @@ if (diagram == "t"){
   WtAv =pourctq*Wtq*ratiotq + pourctqbar*Wtqbar*ratiotqbar;
   //WtAv = Wtq*ratiotq;
   //WtAv = Wtqbar*ratiotqbar;
-  ofstream tchan("Charge_Ratio_t-channel.txt");
+  ofstream tchan("/home/sane/Stage_M1/LIVMass-master/results/matrix_elements/t-channel.txt");
   for (int i=0; i<4; i++) {tchan<<WtAv[i]<<endl;}
   tchan.close();
 }
 
 if (diagram == "tw" ){
   WtAv =Wtw*ratiotw;
-  ofstream twchan("Charge_Ratio_tw-channel.txt");
+  ofstream twchan("../results/matrix_elements/tw-channel.txt");
   for (int i=0; i<4; i++) {twchan<<WtAv[i]<<endl;}
   twchan.close();
 }
@@ -205,14 +227,14 @@ if (diagram == "tbar" ){
   //WtAv = Wtqbar*ratiotqbar;
   //WtAv = Wtq*ratiotq;
 
-  ofstream twchan("Charge_Ratio_tbar-channel.txt");
+  ofstream twchan("/home/sane/Stage_M1/LIVMass-master/results/matrix_elements/tbar-channel.txt");
   for (int i=0; i<4; i++) {twchan<<WtAv[i]<<endl;}
   twchan.close();
 }
 if (diagram == "tbarw" ){
   WtAv =Wtw*ratiotw;
 
-  ofstream tbarwchan("Charge_Ratio_tbarw-channel.txt");
+  ofstream tbarwchan("/home/sane/Stage_M1/LIVMass-master/results/matrix_elements/tbarw-channel.txt");
   for (int i=0; i<4; i++) {tbarwchan<<WtAv[i]<<endl;}
   tbarwchan.close();
 }
@@ -224,7 +246,7 @@ cin>>b_mu;
 
 double b_muvalue = atof(b_mu.c_str());
 //string buff = to_string(b_mu);
-string nameFile = "Modulation_Temporelle_13TeV_b"+b_mu+".root";
+string nameFile = "../results/modulation/Modulation_Temporelle_13TeV_b"+b_mu+".root";
 TLorentzVector b_mu0 (b_muvalue, 0., 0., 0.);
 TLorentzVector b_mu1 (0., b_muvalue, 0., 0.);
 TLorentzVector b_mu2 (0., 0., b_muvalue, 0.);
@@ -234,12 +256,12 @@ TFile* File = new TFile (nameFile.c_str(), "UPDATE");
 
 
 
-auto legend = new TLegend(0.75,0.75,0.95,0.95);
+auto legend = new TLegend(0.70,0.75,0.95,0.95);
 TGraph* graphx = new TGraph (48);
 TGraph* graphy = new TGraph (48);
 TGraph* graphz = new TGraph (48);
 TGraph* grapht = new TGraph (48);
-//TGraph* graphSM = new TGraph(48);
+TGraph* graphSM = new TGraph(48);
 
 double ft = 0;
 double xi_1 = sin(46.309)*cos(101.290);
@@ -253,44 +275,50 @@ if (diagram == "t" || diagram == "tbar")
 {min = -0.01; max = 0.01;}
 
 if (diagram == "tw" || diagram == "tbarw")
-{min = -0.05; max =0.05;}
+{min = -0.01; max =0.01;}
 
 int i = 0;
 for (double t=0; t<=24 ; t+=0.5)
 {
   ft = b_mu0[3]*WtAv[3] - b_mu0[0]*(xi_1*cos(2*M_PI/24*t)+xi_2*sin(2*M_PI/24*t))*WtAv[2]+b_mu0[1]*(xi_2*cos(2*M_PI/24*t)-xi_1*sin(2*M_PI/24*t))*WtAv[2]+b_mu0[2]*xi_3*WtAv[2];
   graphx->SetPoint(i, t, ft);
-  if (ft>max) {do {max += 0.3;} while (ft>max);};
-  if (ft<min) {do {min -=0.3;} while (ft<min);};
-  cout<<"min="<<min<<"  max="<<max<<endl;
+  cout<<ft<<endl;
+  if (ft>max) {do {max += 0.01;} while (ft>max);};
+  if (ft<min) {do {min -=0.01;} while (ft<min);};
+  //cout<<"min="<<min<<"  max="<<max<<endl;
   ft = b_mu1[3]*WtAv[3] - b_mu1[0]*(xi_1*cos(2*M_PI/24*t)+xi_2*sin(2*M_PI/24*t))*WtAv[2]+b_mu1[1]*(xi_2*cos(2*M_PI/24*t)-xi_1*sin(2*M_PI/24*t))*WtAv[2]+b_mu1[2]*xi_3*WtAv[2];
   graphy->SetPoint(i, t, ft);
-  if (ft>max) {do {max += 0.3;} while (ft>max);};
-  if (ft<min) {do {min -=0.3;} while (ft<min);};
-    cout<<"min="<<min<<"  max="<<max<<endl;
+  if (ft>max) {do {max += 0.01;} while (ft>max);};
+  if (ft<min) {do {min -=0.01;} while (ft<min);};
+
   ft = b_mu2[3]*WtAv[3] - b_mu2[0]*(xi_1*cos(2*M_PI/24*t)+xi_2*sin(2*M_PI/24*t))*WtAv[2]+b_mu2[1]*(xi_2*cos(2*M_PI/24*t)-xi_1*sin(2*M_PI/24*t))*WtAv[2]+b_mu2[2]*xi_3*WtAv[2];
   graphz->SetPoint(i, t, ft);
-  if (ft>max) {do {max += 0.3;} while (ft>max);};
-  if (ft<min) {do {min -=0.3;} while (ft<min);};
-  cout<<"min="<<min<<"  max="<<max<<endl;
+  if (ft>max) {do {max += 0.01;} while (ft>max);};
+  if (ft<min) {do {min -=0.01;} while (ft<min);};
+
   ft = b_mu3[3]*WtAv[3] - b_mu3[0]*(xi_1*cos(2*M_PI/24*t)+xi_2*sin(2*M_PI/24*t))*WtAv[2]+b_mu3[1]*(xi_2*cos(2*M_PI/24*t)-xi_1*sin(2*M_PI/24*t))*WtAv[2]+b_mu3[2]*xi_3*WtAv[2];
   grapht->SetPoint(i, t, ft);
-  if (ft>max) {do {max += 0.3;} while (ft>max);};
-  if (ft<min) {do {min -=0.3;} while (ft<min);};
-  cout<<"min="<<min<<"  max="<<max<<endl;
+  if (ft>max) {do {max += 0.01;} while (ft>max);};
+  if (ft<min) {do {min -=0.01;} while (ft<min);};
+
   i++;
 }
 
 
-string namex = "bx = "+b_mu+" GeV";
-string namey = "by = "+b_mu+" GeV";
-string namez = "bz = "+b_mu+" GeV";
-string namet = "bt = "+b_mu+" GeV";
+string namex = "b_{x} = "+b_mu+" GeV";
+string namey = "b_{y} = "+b_mu+" GeV";
+string namez = "b_{z} = "+b_mu+" GeV";
+string namet = "b_{t} = "+b_mu+" GeV";
+
+graphx->SetLineWidth(3);
+graphy->SetLineWidth(3);
+graphz->SetLineWidth(3);
+grapht->SetLineWidth(3);
 
 graphx->SetLineColor(kOrange);
 graphy->SetLineColor(kRed);
 graphz->SetLineColor(kBlue);
-grapht->SetLineColor(kGreen);
+grapht->SetLineColor(8);
 
 legend->AddEntry(graphx,namex.c_str(), "l");
 legend->AddEntry(graphy,namey.c_str(), "l");
@@ -311,11 +339,12 @@ File->Close();
   ft = 0;
   graphSM->SetPoint(i, t, ft);
   i++;
-}
+}*/
 
-graphSM->SetLineColor(kBlack);
-graphSM->Write(diagram+"SM");
-legend->AddEntry(graphSM,"SM", "l");*/
+//graphSM->SetLineColor(kBlack);
+//graphSM->SetLineWidth(3);
+//graphSM->Write(diagram+"SM");
+//legend->AddEntry(graphSM,"SM", "l");
 
 TCanvas* modul = new TCanvas("Modulation", "", 600 , 600);
 modul->SetLeftMargin(0.14);
@@ -325,7 +354,8 @@ TH2F* axe = new TH2F (" ", " ",49 ,0 ,24 ,49 ,min ,max );
 axe->SetStats(kFALSE);
 axe->GetYaxis()->SetTitleOffset(2.0);
 axe->GetXaxis()->SetTitle("t (h)");
-axe->GetYaxis()->SetTitle("f(t) = SME/SM -1");
+axe->GetYaxis()->SetTitle("f(t) = #sigma_{SME}/#sigma_{SM} - 1 ");
+//axe->GetYaxis()->SetTitle("Charge asymmetry");
 axe->GetXaxis()->CenterTitle(kTRUE);
 axe->GetYaxis()->CenterTitle(kTRUE);
 axe->Draw("SAME");
@@ -334,10 +364,10 @@ graphy->Draw("SAME");
 graphz->Draw("SAME");
 grapht->Draw("SAME");
 //graphSM->Draw("SAME");
-legend->Draw("SAME");
+legend->Draw();
 
 
-modul->SaveAs("Modulation_"+diagram+".pdf");
+modul->SaveAs("../results/graph/Modulation_"+diagram+".pdf");
 
 return 0;
 }

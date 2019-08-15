@@ -21,11 +21,12 @@ const double ckm1  = ckm[2][2]*ckm[2][2];
 
 //*************** Contructor ******************//
 
-MatrixSingleTop::MatrixSingleTop (TLorentzVector pMother1_user, TLorentzVector b_user, TLorentzVector pt_user, TLorentzVector p3_user, int pMother1_PID_user, int p3_PID_user, int nature_user, double pTmu_user, double etamu_user, double pTelec_user, double etaElec_user){
+MatrixSingleTop::MatrixSingleTop (TLorentzVector pMother1_user, TLorentzVector b_user, TLorentzVector pt_user, TLorentzVector p3_user, int pMother1_PID_user, int p3_PID_user, int b_PID_user, int nature_user, double pTmu_user, double etamu_user, double pTelec_user, double etaElec_user){
 
   //Particule identity
   pMother1_PID = pMother1_PID_user;
   p3_PID     = p3_PID_user;
+  b_PID      = b_PID_user;
   nature     = nature_user;
   pTelec     = pTelec_user;
   etaElec    = etaElec_user;
@@ -37,12 +38,17 @@ MatrixSingleTop::MatrixSingleTop (TLorentzVector pMother1_user, TLorentzVector b
   pt     = pt_user;
   p3     = p3_user;
 
+  //change the value of the PID from root standard so it match CKM matrix standard
   if (pMother1_PID==2||pMother1_PID==1) pMother1_PID=0;
   if (pMother1_PID==4||pMother1_PID==3) pMother1_PID=1;
   if (pMother1_PID==5||pMother1_PID==6) pMother1_PID=2;
   if (p3_PID==2||p3_PID==1) p3_PID=0;
   if (p3_PID==4||p3_PID==3) p3_PID=1;
   if (p3_PID==5||p3_PID==6) p3_PID=2;
+  if (b_PID==2||b_PID==1) b_PID=0;
+  if (b_PID==4||b_PID==3) b_PID=1;
+  if (b_PID==5||b_PID==6) b_PID=2;
+
 
     if(nature == 1) {Mbq    = calculateMbq(); Mbq_mu = calculateMbq_mu();}
 
@@ -66,7 +72,7 @@ double MatrixSingleTop::calculateMbg(){
   double frac4 = (mt2-mW2)/(t-mt2);
   double frac5 = mt2/(t-mt2);
   double frac6 = (mt2-mW2)/s;
-  double constant = gS2*gW2*ckm1/24;
+  double constant = gS2*gW2*ckm[b_PID][1]/24;
 
   //return Mbg
   return  constant*(-2*frac1-(frac1+2)*(frac2+frac3+2*frac4*(frac5+frac6+1)));
@@ -117,7 +123,7 @@ double MatrixSingleTop::calculateMbqbar(){
 
       double s = normMinkowski2(pt + p3);
       double t = normMinkowski2(pMother1 - pt);
-      double constant = ckm1*gW2*gS2/12;
+      double constant = ckm[b_PID][1]*gW2*gS2/12;
       double frac1    = 1/(mW2*s);
       double frac2    = mt2*mt2/((t-mt2)*(t-mt2)*(t-mt2));
       double frac3    = mt2/mW2;

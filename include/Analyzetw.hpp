@@ -1,24 +1,24 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Mon May  6 14:57:32 2019 by ROOT version 6.10/04
+// Fri Jun  7 12:59:03 2019 by ROOT version 6.10/04
 // from TTree LHEF/Analysis tree
-// found on file: SingleTopTQ.root
+// found on file: twchan_13TeV_fixed.root
 //////////////////////////////////////////////////////////
 
-#ifndef root_simu_h
-#define root_simu_h
+#ifndef Analyzetw_h
+#define Analyzetw_h
 
 #include "../include/const.hpp"
+#include <TLorentzVector.h>
 #include <TROOT.h>
 #include <TChain.h>
 #include <TFile.h>
-#include <TLorentzVector.h>
 
 // Header file for the classes stored in the TTree if any.
 #include "TClonesArray.h"
 #include "TObject.h"
 
-class root_simu {
+class Analyzetw {
 public :
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
    Int_t           fCurrent; //!current Tree number in a TChain
@@ -26,7 +26,7 @@ public :
 // Fixed size dimensions of array or collections stored in the TTree if any.
    static constexpr Int_t kMaxEvent = 1;
    static constexpr Int_t kMaxRwgt = 1;
-   static constexpr Int_t kMaxParticle = 8;
+   static constexpr Int_t kMaxParticle = 10;
 
    // Declaration of leaf types
    Int_t           Event_;
@@ -106,13 +106,14 @@ public :
    TBranch        *b_Particle_Spin;   //!
    TBranch        *b_Particle_size;   //!
 
-   // TLorentzVector, int, double parameters declaration
+
    TLorentzVector *pMother1, *b, *pt, *p3;
 
    double *pTelec, *etaElec, *etamu, *pTmu;
    int *nature, *pMother1_PID, *p3_PID, *b_PID;
-   root_simu(TString rootFile, TTree *tree=0);
-   virtual ~root_simu();
+
+   Analyzetw(TString rootFile, TTree *tree=0);
+   virtual ~Analyzetw();
    virtual Int_t    Cut(Long64_t entry);
    virtual Int_t    GetEntry(Long64_t entry);
    virtual Long64_t LoadTree(Long64_t entry);
@@ -124,35 +125,35 @@ public :
 
 #endif
 
-#ifdef root_simu_cxx
-root_simu::root_simu(TString rootFile, TTree *tree) : fChain(0)
+#ifdef Analyzetw_cxx
+Analyzetw::Analyzetw(TString rootFile, TTree *tree) : fChain(0)
 {
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-     TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("data/"+rootFile);
-     if (!f || !f->IsOpen()) {
-        f = new TFile("data/"+rootFile);
-     }
-     f->GetObject("LHEF",tree);
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("data/"+rootFile);
+      if (!f || !f->IsOpen()) {
+         f = new TFile("data/"+rootFile);
+      }
+      f->GetObject("LHEF",tree);
 
    }
    Init(tree);
 }
 
-root_simu::~root_simu()
+Analyzetw::~Analyzetw()
 {
    if (!fChain) return;
    delete fChain->GetCurrentFile();
 }
 
-Int_t root_simu::GetEntry(Long64_t entry)
+Int_t Analyzetw::GetEntry(Long64_t entry)
 {
 // Read contents of entry.
    if (!fChain) return 0;
    return fChain->GetEntry(entry);
 }
-Long64_t root_simu::LoadTree(Long64_t entry)
+Long64_t Analyzetw::LoadTree(Long64_t entry)
 {
 // Set the environment to read one entry
    if (!fChain) return -5;
@@ -165,7 +166,7 @@ Long64_t root_simu::LoadTree(Long64_t entry)
    return centry;
 }
 
-void root_simu::Init(TTree *tree)
+void Analyzetw::Init(TTree *tree)
 {
    // The Init() function is called when the selector needs to initialize
    // a new tree or chain. Typically here the branch addresses and branch
@@ -221,7 +222,7 @@ void root_simu::Init(TTree *tree)
    Notify();
 }
 
-Bool_t root_simu::Notify()
+Bool_t Analyzetw::Notify()
 {
    // The Notify() function is called when a new file is opened. This
    // can be either for a new TTree in a TChain or when when a new TTree
@@ -232,18 +233,18 @@ Bool_t root_simu::Notify()
    return kTRUE;
 }
 
-void root_simu::Show(Long64_t entry)
+void Analyzetw::Show(Long64_t entry)
 {
 // Print contents of entry.
 // If entry is not specified, print current entry
    if (!fChain) return;
    fChain->Show(entry);
 }
-Int_t root_simu::Cut(Long64_t entry)
+Int_t Analyzetw::Cut(Long64_t entry)
 {
 // This function may be called from Loop.
 // returns  1 if entry is accepted.
 // returns -1 otherwise.
    return 1;
 }
-#endif // #ifdef root_simu_cxx
+#endif // #ifdef Analyzetw_cxx

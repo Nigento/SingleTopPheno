@@ -39,6 +39,7 @@ void root_simu::Loop()
    p3       = new TLorentzVector[nentries];
    nature   = new int[nentries];
    p3_PID   = new int[nentries];
+   b_PID    = new int[nentries];
    pMother1_PID = new int[nentries];
    pTmu     = new double[nentries];
    etamu    = new double[nentries];
@@ -82,6 +83,7 @@ void root_simu::Loop()
           b[jentry].SetPy(Particle_Py[part]);
           b[jentry].SetPz(Particle_Pz[part]);
           b[jentry].SetE(Particle_E[part]);
+          b_PID[jentry] = abs(Particle_PID[part]);
         }
         //Fill the random mother 4-vector
         if(abs(Particle_PID[part])!=5 && Particle_Status[part]==-1){

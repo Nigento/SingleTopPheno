@@ -25,6 +25,7 @@ class MatrixSingleTop {
     int nature;
     int pMother1_PID;
     int p3_PID;
+    int b_PID;
     double pTelec;
     double etaElec;
     double pTmu;
@@ -50,7 +51,7 @@ class MatrixSingleTop {
             MatrixSingleTop();
             ~MatrixSingleTop();
 
-            MatrixSingleTop (TLorentzVector pMother1_user, TLorentzVector b_user, TLorentzVector pt_user, TLorentzVector p3_user, int pMother1_PID_user, int p3_PID_user, int nature_user,double pTmu_user, double etamu_user, double pTelec_user, double etaElec_user);
+            MatrixSingleTop (TLorentzVector pMother1_user, TLorentzVector b_user, TLorentzVector pt_user, TLorentzVector p3_user, int pMother1_PID_user, int p3_PID_user, int b_PID_user, int nature_user,double pTmu_user, double etamu_user, double pTelec_user, double etaElec_user);
 
 //****** Recover values previously obtained ******//
 
