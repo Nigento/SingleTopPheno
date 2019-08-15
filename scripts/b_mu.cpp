@@ -21,7 +21,7 @@ int main (){
     <<"tbar - tbar-channel through antib and q diffusion"<<endl
     <<"tbarw - tbarW-channel"<<endl;
     cin>>diagram;}
-  while (diagram !="t" && diagram !="cw" && diagram !="tbar" && diagram !="tbarw" );
+  while (diagram !="t" && diagram !="tw" && diagram !="tbar" && diagram !="tbarw" );
 
 
 
@@ -211,7 +211,7 @@ if (diagram == "t"){
   WtAv =pourctq*Wtq*ratiotq + pourctqbar*Wtqbar*ratiotqbar;
   //WtAv = Wtq*ratiotq;
   //WtAv = Wtqbar*ratiotqbar;
-  ofstream tchan("/home/sane/Stage_M1/LIVMass-master/results/matrix_elements/t-channel.txt");
+  ofstream tchan("../results/matrix_elements/t-channel.txt");
   for (int i=0; i<4; i++) {tchan<<WtAv[i]<<endl;}
   tchan.close();
 }
@@ -227,14 +227,14 @@ if (diagram == "tbar" ){
   //WtAv = Wtqbar*ratiotqbar;
   //WtAv = Wtq*ratiotq;
 
-  ofstream twchan("/home/sane/Stage_M1/LIVMass-master/results/matrix_elements/tbar-channel.txt");
+  ofstream twchan("../results/matrix_elements/tbar-channel.txt");
   for (int i=0; i<4; i++) {twchan<<WtAv[i]<<endl;}
   twchan.close();
 }
 if (diagram == "tbarw" ){
   WtAv =Wtw*ratiotw;
 
-  ofstream tbarwchan("/home/sane/Stage_M1/LIVMass-master/results/matrix_elements/tbarw-channel.txt");
+  ofstream tbarwchan("../results/matrix_elements/tbarw-channel.txt");
   for (int i=0; i<4; i++) {tbarwchan<<WtAv[i]<<endl;}
   tbarwchan.close();
 }
