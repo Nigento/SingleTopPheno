@@ -14,12 +14,12 @@ b_mu.cpp : Appelle Analyzetw et matrixSingleTop pour calculer les éléments de 
            
 sensibility.cpp : Crée les histogrammes avec les valeurs extraites de l'article.
                   Les valeurs des différents background sont celles de l'article t
-                  On peut directement changer les valeurs des background lors de la déclaration.
+                  On peut directement changer les valeurs des background lors de la déclaration des variables (aller regarder dans le fichier)
                   
 Xcarre.cpp : Calcule l'error du b_mu à partir des histogrammes générés par sensibility.cpp. Par défaut, le programme ne considère que les erreurs stats.
              
              
-             Pour ajouter les erreurs systs on change la valeur de "systttbar" et autres variables "syst+...". La nouvelle valeur doit être 1 + % d'erreur sur la donnée.
+             Pour ajouter les erreurs systs on change la valeur de "systttbar" et autres variables "syst"+.... La nouvelle valeur doit être 1 + % d'erreur sur la donnée.
              La nouvelle valeur en sortie du programme sera b_mu (syst + stats).
              
 Les commandes pour lancer le programme :
@@ -27,7 +27,9 @@ Les commandes pour lancer le programme :
 Avec un terminal dans le fichier source, on utilise :
 
 ./bin/b_mu pour lancer la première partie après avoir généré le fichier root et l'avoir mis dans le bon dossier avec le bon nom.
-
+        On choisit ensuite les processus étudiés (t, tw, tbar, tbarw)
+        Enfin, on rentre la valeur de b_mu qu'on souhaite utiliser pour modéliser les fonctions f(t)
+        
 ./bin/sensibility pour lancer le programme qui crée les histogrammes avec les valeurs qu'on a extrait de l'article et imposé au préalable dans le code.
 
 ./bin/Xcarre pour calculer l'erreur du b_mu en fonction des paramètres imposés dans le code.

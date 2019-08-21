@@ -197,7 +197,7 @@ int main (){
   }
   }
 
-//Calcuate the charge ratio considering we have different diagram for a single generation
+//Calcuate the ratio considering we have different diagram for a single generation
 //When we simule tq and so tqbar, we have different cross-sect for tq and tqbar. The following expression weights each calculated matrix element.
 double ratiotq = 1.0/nbtq;
 double ratiotqbar=1.0/nbtqbar;
@@ -269,6 +269,7 @@ double xi_2 = sin(101.2790);
 double xi_3 = cos(46.309)*cos(101.2790);
 
 
+//Compute the temporal modulation of the top cross section
 
 double min,max;
 if (diagram == "t" || diagram == "tbar")
@@ -304,6 +305,8 @@ for (double t=0; t<=24 ; t+=0.5)
   i++;
 }
 
+
+//Draw the graph of temporal modulation and save the data in rootfile
 
 string namex = "b_{x} = "+b_mu+" GeV";
 string namey = "b_{y} = "+b_mu+" GeV";
